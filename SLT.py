@@ -3,14 +3,30 @@
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 @Author : Vic P.
 @Email  : vic4key@gmail.com
-@Name   : Manual LR model for Kaggle SLR
+@Name   : Manual Linear Regression for Kaggle SLR
 @Url    : https://www.kaggle.com/kalcal/simple-linear-regression
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 import sys
-import numpy as NP
-import matplotlib.pyplot as PLT
-import Vutil as vu
+import numpy as np
+import matplotlib.pyplot as plt
+from PyVutils import Others
+
+def Print(A, B, Xs, Ys):
+
+    F = lambda x : B * x  + A # Fx = βx + α
+
+    plt.title(r"Simple Linear Regression (F = $\beta x + \alpha $ = %.3fx + %.3f)" % (A, B))
+    plt.axis([min(Xs), max(Xs), min(Ys), max(Ys)])
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid(True)
+    plt.plot(Xs, Ys, "o")
+    plt.plot(Xs, F(Xs))
+    plt.get_current_fig_manager().full_screen_toggle()
+    plt.show()
+
+    return
 
 def LinearRegression(Xs, Ys):
 
@@ -32,13 +48,13 @@ def LinearRegression(Xs, Ys):
 
     # α   = Fxᵢ - βxᵢ (xᵢ & yᵢ here are mean of x & y)
 
-    nPairs = min(NP.size(Xs), NP.size(Ys)) # pairs of data
+    nPairs = min(np.size(Xs), np.size(Ys)) # pairs of data
 
-    meanX, meanY = NP.mean(Xs), NP.mean(Ys)
+    meanX, meanY = np.mean(Xs), np.mean(Ys)
 
     totalXY = totalXX = 0.
 
-    for i in xrange(0, nPairs):
+    for i in range(0, nPairs):
         totalXY += (Xs[i] - meanX) * (Ys[i] - meanY)  # ∑xᵢyᵢ
         totalXX += (Xs[i] - meanX) * (Xs[i] - meanX)  # ∑xᵢ²
     pass
@@ -50,29 +66,19 @@ def LinearRegression(Xs, Ys):
 
 def main():
 
-    l = vu.ReadCVS("data/train.csv", start=1, nrows=100)
+    data = np.loadtxt("data/train.csv", delimiter=",", skiprows=1)
+    Xs, Ys = list(data.T)
+    A, B = LinearRegression(Xs, Ys) # calculate coefficients α & β
+    Print(A, B, Xs, Ys)
 
-    pairs = NP.array(l).astype(NP.float)  # NP.random.uniform(low=5, high=10, size=(10, 2)) # NP.random.randn(50, 2)
-
-    Xs, Ys = list(pairs.transpose())      # split to Xs & Ys
-
-    A, B = LinearRegression(Xs, Ys)       # calculate coefficients α & β
-
-    F = lambda x : B * x  + A             # Fx = βx + α
-
-    PLT.title(r"Simple Linear Regression (F = $\beta x + \alpha $ = %.3fx + %.3f)" % (A, B))
-    PLT.axis([min(Xs), max(Xs), min(Ys), max(Ys)])
-    PLT.xlabel("X")
-    PLT.ylabel("Y")
-    PLT.grid(True)
-    PLT.plot(Xs, Ys, "o")
-    PLT.plot(Xs, F(Xs))
-    PLT.show()
+    data = np.loadtxt("data/sample.csv", delimiter=",", skiprows=1)
+    Xs, Ys = list(data.T)
+    A, B = LinearRegression(Xs, Ys) # calculate coefficients α & β
+    Print(A, B, Xs, Ys)
 
     return
 
 if __name__ == "__main__":
-    try:
-        main()
-    except (Exception, KeyboardInterrupt): vu.LogException(sys.exc_info())
+    try: main()
+    except (Exception, KeyboardInterrupt): Others.LogException(sys.exc_info())
     sys.exit()
